@@ -5,8 +5,6 @@ import tcxparser
 import xmltodict as xml
 import collections
 from pint import UnitRegistry
-
-from pint import UnitRegistry
 import datetime
 
 ureg = UnitRegistry()
@@ -40,9 +38,6 @@ def run_metrics(tcx_file, run_type=None):
             if laps:
                 for n, lap in enumerate(laps):
                     lap_dict[n] = float(total_dist_m), float(total_time_sec)
-
-
-
                     total_dist_m += float(lap['DistanceMeters'])
                     total_time_sec += float(lap['TotalTimeSeconds'])
 
@@ -82,29 +77,61 @@ def track_lap_time(distance_in_meters, lap_type='speed', speed_1600m=(417, 427),
     return target
 
 
-def return_laps(tcx_file):
+def parse_lap_metrics(tcx_file):
+
     """Parses tcx_file and returns lap-by-lap metrics.
-    Returns: start time of run and dictionary of lap, distance, and time."""
+    Returns a list of dictionaries for each lap with the following metrics:
+        * lap start time
+        * total lap time in seconds
+        * total lap distance in meters
+        * starting altitude of lap
+        * ending altitude of lap
+        """
 
     with open(tcx_file) as tcx:
         try:
             tcx_obj = xml.parse(tcx.read())
-            total_dist_m = 0
-            total_time_sec = 0
-            start_time = str(tcx_obj['TrainingCenterDatabase']['Activities']['Activity']['Lap'][0]['@StartTime'])
-            lap_dict = collections.OrderedDict()
+            run_type = tcx_file.split('_')[1]
             laps = tcx_obj['TrainingCenterDatabase']['Activities']['Activity']['Lap']
-            return laps
-        #     if laps:
-        #         for n, lap in enumerate(laps):
-        #             lap_dict[n] = float(total_dist_m), float(total_time_sec)
-        #             total_dist_m += float(lap['DistanceMeters'])
-        #             total_time_sec += float(lap['TotalTimeSeconds'])
-        #         return lap_dict
-        #     else:
-        #         return None
+            keys = ['lap_start', 'seconds', 'meters', 'start_meters', 'end_meters',
+                    'start_altitude', 'end_altitude', 'average_cadence']
+            lap_list = []
+            for n, lap in enumerate(laps):
+                d = {k:None for k in keys}
+                if n==0:
+                    run_start = lap['@StartTime']
+                try:
+                    d['run_type'] = run_type
+                    d['run_start'] = run_start
+                    d['lap_start'] = lap['@StartTime']
+                    d['seconds'] = float(lap['TotalTimeSeconds'])
+                    d['meters'] = float(lap['DistanceMeters'])
+                    d['start_meters'] = float(lap['Track']['Trackpoint'][0]['DistanceMeters'])
+                    d['end_meters'] = float(lap['Track']['Trackpoint'][-1]['DistanceMeters'])
+                    d['average_cadence'] = float(lap['Extensions']['ns3:LX']['ns3:AvgRunCadence'])
+                    d['start_altitude'] = float(lap['Track']['Trackpoint'][0]['AltitudeMeters'])
+                    d['end_altitude'] = float(lap['Track']['Trackpoint'][-1]['AltitudeMeters'])
+                    d['average_cadence'] = float(lap['Extensions']['ns3:LX']['ns3:AvgRunCadence'])
+                    lap_list.append(d)
+                except KeyError:
+                    lap_list.append(d)
+            return lap_list
         except:
-            print "Error! Unable to read file: ", tcx_file
             return None
 
+def seconds_to_minutes(seconds):
+
+    '''Convert seconds as float to minutes.'''
+
+    secs = seconds * ureg.seconds
+    minutes = secs.to(ureg.minute)
+    return minutes.magnitude
+
+def meters_to_miles(meters):
+
+    '''Convert meters as float to meters.'''
+
+    dist_m = meters * ureg.meter
+    miles = dist_m.to(ureg.mile)
+    return miles.magnitude
 
