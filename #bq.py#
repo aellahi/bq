@@ -77,6 +77,7 @@ def track_lap_time(distance_in_meters, lap_type='speed', speed_1600m=(417, 427),
     return target
 
 
+
 def parse_lap_metrics(tcx_file):
 
     """Parses tcx_file and returns lap-by-lap metrics.
@@ -93,52 +94,24 @@ def parse_lap_metrics(tcx_file):
             tcx_obj = xml.parse(tcx.read())
             run_type = tcx_file.split('_')[1]
             laps = tcx_obj['TrainingCenterDatabase']['Activities']['Activity']['Lap']
-            #print(type(laps))
-            if isinstance(laps, list):
-                print('What!?')
-                keys = ['lap_start', 'seconds', 'meters', 'start_meters', 'end_meters',
-                        'start_altitude', 'end_altitude', 'average_cadence']
-                lap_list = []
-                for n, lap in enumerate(laps):
-                    d = {k:None for k in keys}
-                    if n==0:
-                        run_start = lap['@StartTime']
-                    try:
-                        d['run_type'] = run_type
-                        d['run_start'] = run_start
-                        d['lap_start'] = lap['@StartTime']
-                        d['seconds'] = float(lap['TotalTimeSeconds'])
-                        d['meters'] = float(lap['DistanceMeters'])
-                        d['start_meters'] = float(lap['Track']['Trackpoint'][0]['DistanceMeters'])
-                        d['end_meters'] = float(lap['Track']['Trackpoint'][-1]['DistanceMeters'])
-                        d['average_cadence'] = float(lap['Extensions']['ns3:LX']['ns3:AvgRunCadence'])
-                        d['start_altitude'] = float(lap['Track']['Trackpoint'][0]['AltitudeMeters'])
-                        d['end_altitude'] = float(lap['Track']['Trackpoint'][-1]['AltitudeMeters'])
-                        d['average_cadence'] = float(lap['Extensions']['ns3:LX']['ns3:AvgRunCadence'])
-                        lap_list.append(d)
-                    except KeyError:
-                        lap_list.append(d)
-                return lap_list
-            elif isinstance(laps, dict):
+            keys = ['lap_start', 'seconds', 'meters', 'start_meters', 'end_meters',                    'start_altitude', 'end_altitude', 'average_cadence']
+            lap_list = []
+            for n, lap in enumerate(laps):
+                d = {k:None for k in keys}
+                if n==0:
+                    run_start = lap['@StartTime']
                 try:
-                    track_list = tcx_obj['TrainingCenterDatabase']['Activities']['Activity']['Lap']['Track']['Trackpoint']
-                    trackpoints = []
-                    keys = ['time', 'position', 'altitude_meters', 'distance_meters']
-                    for n, trackpoint in enumerate(track_list):
-                        d = {k:None for k in keys}
-                        try:
-                            d['time'] = trackpoint['Time']
-                            d['position'] = trackpoint['Position']
-                            d['altitude_meters'] = trackpoint['AltitudeMeters']
-                            d['distance_meters'] = trackpoint['DistanceMeters']
-                        except KeyError:
-                            pass
-                        trackpoints.append(d)
-                    return trackpoints
-                except:
-                    return None
-        except:
-            return None
+                    d['run_type'] = run_type
+                    d['run_start'] = run_start
+                    d['lap_start'] = lap['@StartTime']
+                    d['seconds'] = float(lap['TotalTimeSeconds'])
+                    d['meters'] = float(lap['DistanceMeters'])
+                    d['start_meters'] = float(lap['Track']['Trackpoint'][0]['DistanceMeters'])
+                    d['end_meters'] = float(lap['Track']['Trackpoint'][-1]['DistanceMeters'])
+                    d['average_cadence'] = float(lap['Extensions']['ns3:LX']['ns3:AvgRunCadence'])
+                    d['start_altitude'] = float(lap['Track']['Trackpoint'][0]['AltitudeMeters'])
+                    d['end_altitude'] = float(lap['Track']['Trackpoint'][-1]['AltitudeMeters'])
+                    d['average_cadence'] = float(lap['Extensions'
 
 def seconds_to_minutes(seconds):
 
