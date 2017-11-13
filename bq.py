@@ -91,11 +91,10 @@ def parse_lap_metrics(tcx_file):
     with open(tcx_file) as tcx:
         try:
             tcx_obj = xml.parse(tcx.read())
-            run_type = tcx_file.split('_')[1]
+            run_type = tcx_file.split('_')[1].split('.')[0]
             laps = tcx_obj['TrainingCenterDatabase']['Activities']['Activity']['Lap']
             #print(type(laps))
             if isinstance(laps, list):
-                print('What!?')
                 keys = ['lap_start', 'seconds', 'meters', 'start_meters', 'end_meters',
                         'start_altitude', 'end_altitude', 'average_cadence']
                 lap_list = []
