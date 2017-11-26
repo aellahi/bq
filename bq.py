@@ -9,6 +9,15 @@ import datetime
 
 ureg = UnitRegistry()
 
+# To structure with classes
+# Create a "lap" object
+# Attributes:
+    # * distance
+    # * pace in minutes/mile
+    # * start altitude
+    # * end altitude
+    # * altitude change
+
 
 def run_metrics(tcx_file, run_type=None):
     """Parses a Fitbit tcx_file.
@@ -139,17 +148,30 @@ def parse_lap_metrics(tcx_file):
         except:
             return None
 
-def seconds_to_minutes(seconds):
+def seconds_to_minutes(seconds, format='float'):
 
-    '''Convert seconds as float to minutes.'''
+    '''Convert seconds to minutes.
 
-    secs = seconds * ureg.seconds
-    minutes = secs.to(ureg.minute)
-    return minutes.magnitude
+    Parameters
+    ----------
+    seconds: number of seconds
+    format: 'float' or 'hh:mm:ss'; default 'float'
+    '''
+
+    if format=='float':
+        secs = seconds * ureg.seconds
+        minutes = secs.to(ureg.minute)
+        return minutes.magnitude
+    elif format=='hh:mm:ss':
+        return str(datetime.timedelta(seconds=seconds))
+    else:
+        # Raise exception
+        print('Unrecognized format!')
+        raise Exception
 
 def meters_to_miles(meters):
 
-    '''Convert meters as float to meters.'''
+    '''Convert meters to miles.'''
 
     dist_m = meters * ureg.meter
     miles = dist_m.to(ureg.mile)
