@@ -18,6 +18,27 @@ ureg = UnitRegistry()
     # * end altitude
     # * altitude change
 
+class lap:
+    """A lap object."""
+
+    # Default distance = 1 mile
+    distance = ureg.mile
+
+    def meters_to_miles(meters):
+        """Convert meters to miles."""
+
+        dist_m = meters * ureg.meter
+        miles = dist_m.to(ureg.mile)
+        return miles.magnitude
+
+    def __init__(self, seconds, start_altitude, end_altitude):
+        self.seconds = seconds
+        self.minutes =
+        self.pace =
+        self.start_altitude =
+        self.end_altitude =
+        self.altitude_change =
+
 
 def run_metrics(tcx_file, run_type=None):
     """Parses a Fitbit tcx_file.
