@@ -6,7 +6,7 @@ import xmltodict as xml
 import collections
 from pint import UnitRegistry
 import datetime
-
+import pandas as pd
 ureg = UnitRegistry()
 
 # To structure with classes
@@ -109,7 +109,7 @@ def track_lap_time(distance_in_meters, lap_type='speed', speed_1600m=(417, 427),
 
 def parse_lap_metrics(tcx_file):
 
-    """Parses tcx_file and returns lap-by-lap metrics.
+    """Parses tcx_file and returns pandas dataframe with lap-by-lap metrics.
     Returns a list of dictionaries for each lap with the following metrics:
         * lap start time
         * total lap time in seconds
@@ -147,7 +147,11 @@ def parse_lap_metrics(tcx_file):
                         lap_list.append(d)
                     except KeyError:
                         lap_list.append(d)
-                return lap_list
+                df = pd.DataFrame(lap_list)
+                df.sort_values(by='lap_start', inplace=True)
+                df['run_start'] = pd.to_datetime(df['run_start'])
+                df['lap_start'] = pd.to_datetime(df['lap_start'])
+                return df
             elif isinstance(laps, dict):
                 try:
                     track_list = tcx_obj['TrainingCenterDatabase']['Activities']['Activity']['Lap']['Track']['Trackpoint']
