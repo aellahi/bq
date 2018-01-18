@@ -44,7 +44,27 @@ for f in dir_contents:
 
 # concat all dfs  into one df
 all_laps = pd.concat(dfs)
+all_laps.reset_index(inplace=True)
+del all_laps['index']
+
+# throw out outliers (mistakes in logging)
+to_drop = all_laps.loc[(all_laps['pace min/mi'] < 5) | (all_laps['pace min/mi'] > 12)].index.tolist()
+all_laps.drop(to_drop, inplace=True)
+# save
 outcsv = '/Users/aishaellahi/py2/bq/runs/laps.csv'
 all_laps.to_csv(outcsv, index=False)
 
 # Aggregate based on run
+subset = ['average_cadence', 'meters', 'run_start', 'run_type',
+'seconds', 'miles','minutes','pace min/mi']
+groupby_cols = ['run_type', 'run_start']
+all_laps_grouped = all_laps[subset].groupby(groupby_cols).aggregate({'meters':'sum',
+'seconds':'sum',
+'miles':'sum',
+'minutes':'sum',
+'pace min/mi':'mean'})
+all_laps_grouped.reset_index(inplace=True)
+
+# save output
+runs_out = '/Users/aishaellahi/py2/bq/runs/runs.csv'
+all_laps_grouped.to_csv(runs_out, index=False)
