@@ -50,9 +50,11 @@ del all_laps['index']
 # throw out outliers (mistakes in logging)
 to_drop = all_laps.loc[(all_laps['pace min/mi'] < 5) | (all_laps['pace min/mi'] > 12)].index.tolist()
 all_laps.drop(to_drop, inplace=True)
-# save
-outcsv = '/Users/aishaellahi/py2/bq/runs/laps.csv'
-all_laps.to_csv(outcsv, index=False)
+
+# add to current laps.csv
+laps_csv = '/Users/aishaellahi/py2/bq/runs/laps.csv'
+with open(laps_csv, 'a') as laps_file:
+    all_laps.to_csv(laps_file, header=False, index=False)
 
 # Aggregate based on run
 subset = ['average_cadence', 'meters', 'run_start', 'run_type',
@@ -65,6 +67,7 @@ all_laps_grouped = all_laps[subset].groupby(groupby_cols).aggregate({'meters':'s
 'pace min/mi':'mean'})
 all_laps_grouped.reset_index(inplace=True)
 
-# save output
-runs_out = '/Users/aishaellahi/py2/bq/runs/runs.csv'
-all_laps_grouped.to_csv(runs_out, index=False)
+# add to current runs.csv
+runs_csv = '/Users/aishaellahi/py2/bq/runs/runs.csv'
+with open(runs_csv, 'a') as runs_file:
+    all_laps_grouped.to_csv(runs_file, header=False, index=False)

@@ -39,7 +39,6 @@ ureg = UnitRegistry()
 #         self.end_altitude =
 #         self.altitude_change =
 
-
 def run_metrics(tcx_file, run_type=None):
     """Parses a Fitbit tcx_file.
     Returns dictionary:
