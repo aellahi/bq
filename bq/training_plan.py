@@ -11,7 +11,7 @@ def date_range(start_date, num_periods, frequency):
     """Returns a list object of datetime objects of length
     num_periods separated by frequency.
     Arguments:
-    -start_date: datetime object of date to start range
+    -start_date: d  atetime object of date to start range
     -num_periods: int object of length of range
     -frequency: int object in days to separate dates between start
     and stop; fed to timedelta as an argument
@@ -79,7 +79,7 @@ def create_training_plan(speed_start, tempo_start, long_start,
 
     workouts = num_weeks * 3
     rows = range(workouts)
-    week_column = pd.Series(np.repeat([1, 2, 3], num_weeks), index=rows,
+    week_column = pd.Series(np.repeat(range(1, num_weeks+1), 3), index=rows,
         dtype=int)
     run_column = pd.Series(['speed', 'tempo', 'long']*num_weeks, index=rows,
         dtype=str)
@@ -118,9 +118,9 @@ def create_training_plan(speed_start, tempo_start, long_start,
 
     for col in str_cols:
         df[col] = ' '
-
+    df['run_details'] = ''
+    df.sort_values(by=['week', 'date'], inplace=True)
+    df.reset_index(inplace=True)
+    del df['index']
+    
     return df
-
-
-test_plan = create_training_plan(speed_start, tempo_start, long_start, num_weeks=18)
-
