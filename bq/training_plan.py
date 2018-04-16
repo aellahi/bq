@@ -79,9 +79,11 @@ def create_training_plan(speed_start, tempo_start, long_start,
 
     workouts = num_weeks * 3
     rows = range(workouts)
-    week_column = pd.Series(np.repeat([1, 2, 3], num_weeks), index=rows)
-    run_column = pd.Series(['speed', 'tempo', 'long']*num_weeks, index=rows)
-    completed_column = pd.Series([False]*workouts, index=rows)
+    week_column = pd.Series(np.repeat([1, 2, 3], num_weeks), index=rows,
+        dtype=int)
+    run_column = pd.Series(['speed', 'tempo', 'long']*num_weeks, index=rows,
+        dtype=str)
+    completed_column = pd.Series([False]*workouts, index=rows, dtype=bool)
     speed_ind = np.arange(0, workouts, 3)
     tempo_ind = speed_ind+1
     long_ind = speed_ind+2
@@ -108,4 +110,17 @@ def create_training_plan(speed_start, tempo_start, long_start,
             df['date'][n] = tempo_dates[n]
         elif row['run'] == 'long':
             df['date'][n] = long_dates[n]
+    df = df.astype({'effort': int, 'pre_run_calories': int,
+    'post_run_calories': int, 'run_calories': int
+    }, inplace=True)
+    str_cols = ['pre_run_food', 'post_run_food', 'run_food',
+    'notes', 'garmin_run_name', 'tcx_file']
+
+    for col in str_cols:
+        df[col] = ' '
+
     return df
+
+
+test_plan = create_training_plan(speed_start, tempo_start, long_start, num_weeks=18)
+
