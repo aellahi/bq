@@ -1,26 +1,27 @@
-import bq
+import parse_tcx
 import pandas as pd
 import numpy as np
 import os
 from datetime import datetime
 from os.path import basename
+import glob
 
 # cd into /Users/aishaellahi/py2/bq/tcx
-tcx_dir = "/Users/aishaellahi/py2/bq/tcx"
-os.chdir(tcx_dir)
-dir_contents = os.listdir(tcx_dir)
+tcx_dir = "/Users/aishaellahi/Dropbox/bq_data/tcx/*/*/*.tcx"
+# os.chdir(tcx_dir)
+# dir_contents = os.listdir(tcx_dir)
 
 # initialize list of dfs
 dfs = []
 
-for f in dir_contents:
+for f in glob.iglob(tcx_dir):
     extension = os.path.splitext(f)[-1]
     if extension == '.tcx':
-        lap_df = bq.parse_lap_metrics(f)
+        lap_df = parse_tcx.parse_lap_metrics(f)
         if isinstance(lap_df, pd.core.frame.DataFrame):
             # Calculate lap pace
-            lap_df['miles'] = lap_df['meters'].apply(bq.meters_to_miles)
-            lap_df['minutes'] = lap_df['seconds'].apply(bq.seconds_to_minutes)
+            lap_df['miles'] = lap_df['meters'].apply(parse_tcx.meters_to_miles)
+            lap_df['minutes'] = lap_df['seconds'].apply(parse_tcx.seconds_to_minutes)
             lap_df['pace min/mi'] = lap_df['minutes']/lap_df['miles']
             lap_df['pace min/mi'] = lap_df['pace min/mi'].round(decimals=2)
             dfs.append(lap_df)
@@ -31,10 +32,10 @@ for f in dir_contents:
             file_month = str(file_date.month).zfill(2)
 
             # move file into appropriate year-month directory
-            path = ("/").join([os.getcwd(), file_year, file_month, f])
-            move_message = "Moving {} to {}".format(f, path)
-            print(move_message)
-            os.rename(f, path)
+            # path = ("/").join([os.getcwd(), file_year, file_month, f])
+            # move_message = "Moving {} to {}".format(f, path)
+            # print(move_message)
+            # os.rename(f, path)
 
             # print message
             message = "Parsed {}".format(f)
@@ -52,7 +53,7 @@ to_drop = all_laps.loc[(all_laps['pace min/mi'] < 5) | (all_laps['pace min/mi'] 
 all_laps.drop(to_drop, inplace=True)
 
 # add to current laps.csv
-laps_csv = '/Users/aishaellahi/py2/bq/runs/laps.csv'
+laps_csv = '/Users/aishaellahi/Dropbox/bq_data/runs/laps.csv'
 with open(laps_csv, 'a') as laps_file:
     all_laps.to_csv(laps_file, header=False, index=False)
 
@@ -68,6 +69,6 @@ all_laps_grouped = all_laps[subset].groupby(groupby_cols).aggregate({'meters':'s
 all_laps_grouped.reset_index(inplace=True)
 
 # add to current runs.csv
-runs_csv = '/Users/aishaellahi/py2/bq/runs/runs.csv'
+runs_csv = '/Users/aishaellahi/Dropbox/bq_data/runs/runs.csv'
 with open(runs_csv, 'a') as runs_file:
     all_laps_grouped.to_csv(runs_file, header=False, index=False)
