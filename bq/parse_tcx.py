@@ -136,12 +136,11 @@ def parse_lap_metrics(tcx_file):
                         d['run_start'] = run_start
                         d['lap_start'] = lap['@StartTime']
                         d['seconds'] = float(lap['TotalTimeSeconds'])
-                        d['meters'] = float(lap['DistanceMeters'])
-                        d['start_meters'] = float(lap['Track']['Trackpoint'][0]['DistanceMeters'])
-                        d['end_meters'] = float(lap['Track']['Trackpoint'][-1]['DistanceMeters'])
-                        d['average_cadence'] = float(lap['Extensions']['ns3:LX']['ns3:AvgRunCadence'])
-                        d['start_altitude'] = float(lap['Track']['Trackpoint'][0]['AltitudeMeters'])
-                        d['end_altitude'] = float(lap['Track']['Trackpoint'][-1]['AltitudeMeters'])
+                        d['distance (m)'] = float(lap['DistanceMeters'])
+                        d['start (m)'] = float(lap['Track']['Trackpoint'][0]['DistanceMeters'])
+                        d['end (m)'] = float(lap['Track']['Trackpoint'][-1]['DistanceMeters'])
+                        d['start_altitude (m)'] = float(lap['Track']['Trackpoint'][0]['AltitudeMeters'])
+                        d['end_altitude (m)'] = float(lap['Track']['Trackpoint'][-1]['AltitudeMeters'])
                         d['average_cadence'] = float(lap['Extensions']['ns3:LX']['ns3:AvgRunCadence'])
                         lap_list.append(d)
                     except KeyError:
@@ -160,13 +159,20 @@ def parse_lap_metrics(tcx_file):
                         d = {k:None for k in keys}
                         try:
                             d['time'] = trackpoint['Time']
-                            d['position'] = trackpoint['Position']
-                            d['altitude_meters'] = trackpoint['AltitudeMeters']
-                            d['distance_meters'] = trackpoint['DistanceMeters']
+                            d['latitude'] = trackpoint['Position']['LatitudeDegrees']
+                            d['longitude'] = trackpoint['Position']['LongitudeDegrees']
+                            d['altitude (m)'] = trackpoint['AltitudeMeters']
+                            d['distance (m)'] = trackpoint['DistanceMeters']
                         except KeyError:
                             pass
                         trackpoints.append(d)
-                    return trackpoints
+                    df = pd.DataFrame(trackpoints, columns=['time', 'distance (m)',
+                    'altitude (m)', 'latitude', 'longitude'])
+                    # enforce types
+                    float_types = ['distance (m)', 'altitude (m)']
+                    for col in float_types:
+                        df[col] = df[col].astype(float)
+                    return df
                 except:
                     return None
         except:
