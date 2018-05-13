@@ -206,3 +206,44 @@ def meters_to_miles(meters):
     dist_m = meters * ureg.meter
     miles = dist_m.to(ureg.mile)
     return miles.magnitude
+
+def total_course_time(distance, pace, miles=True):
+
+    '''Calculates the total time to complete the input distance
+    for a given pace.
+    Arguments:
+    * distance: distance to run. Default units is miles. To change to meters,
+    set miles=False.
+    * pace: pace in mm:ss format. E.g., enter the string "8:35" for 08:35.
+
+    Returns the total time to complete the distance in hh:mm:ss format.
+    '''
+
+    # convert the pace string to total seconds
+    min, sec = tuple(map(int, pace.split(':')))
+    pace_in_seconds = (60*min) + sec
+    total_course_seconds = distance * pace_in_seconds
+    total_course_time = seconds_to_minutes(total_course_seconds,
+    format='hh:mm:ss')
+
+    return total_course_time
+
+def target_pace(distance, total_time, miles=True):
+
+    '''Calculates the target pace to hit to complete the input distance
+    in the total input time.
+    -Arguments:
+    * distance: distance to run. Default units is miles. To change to meters,
+    set miles=False.
+    * total_time: total time in 'hh:mm:ss' format.
+
+    Returns target_pace in 'hh:ss' format.
+    '''
+
+    # convert total_time to seconds
+    hour, min, sec = tuple(map(int, total_time.split(':')))
+    total_seconds = (hour*60*60) + (min*60) + sec
+
+    # divide by distance
+    pace = float(total_seconds)/float(distance)
+    return seconds_to_minutes(pace, format='hh:mm:ss')

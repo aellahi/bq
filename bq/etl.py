@@ -6,6 +6,10 @@ from datetime import datetime
 from os.path import basename
 import glob
 
+
+# First download all tcx's from Garmin and
+#
+
 # cd into /Users/aishaellahi/py2/bq/tcx
 tcx_dir = "/Users/aishaellahi/Dropbox/bq_data/tcx/*/*/*.tcx"
 # os.chdir(tcx_dir)
