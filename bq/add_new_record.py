@@ -38,7 +38,7 @@ for col, field in new_record.items():
 
 # re-create records df
 modified_records_df = pd.DataFrame(records)
-modified_records_df.reset_index(inplace=True, drop=True)
+modified_records_df.reset_index(inplace=True)
 
 # save
 modified_records_df.to_csv(FILENAME, index=False)
