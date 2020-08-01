@@ -1,0 +1,13 @@
+---
+  date: '2020-07-30'
+  run: 'tempo'
+  effort: 5
+  pre_run_calories: 0
+  pre_run_food: ' '
+  post_run_calories: 425
+  post_run_food: 'oats'
+  run_food:
+  run_calories: 0
+  notes: 'slept well'
+  tcx_file: ' '
+  garmin_run_name: '20200730_tempo'
