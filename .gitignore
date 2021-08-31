@@ -6,3 +6,7 @@
 # tcx files with location data #
 ###################
 *.tcx
+
+# misc
+*.csv
+*.ipynb
